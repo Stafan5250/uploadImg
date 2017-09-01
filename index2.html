@@ -7,49 +7,49 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
     <title>uploadImg</title>
     <style>
-        html,
-        body,
-        .main-box {
-            height: 100%;
-            width: 100%;
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .main-box {
-            padding: 30px;
-        }
-        
-        .upload-box {
-            position: relative;
-            width: 240px;
-            height: 160px;
-            margin: 0 auto;
-            box-sizing: border-box;
-            border: 1px solid #666;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .upload-box > input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: block;
-            width: 100%;
-            height: 100%;
-            border: none;
-            outline: none;
-            opacity: 0;
-        }
-        
-        .upload-box > p {
-            font: 1.3rem/2 "";
-            color: #666;
-            margin: 0;
-        }
+    html,
+    body,
+    .main-box {
+        height: 100%;
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .main-box {
+        padding: 30px;
+    }
+    
+    .upload-box {
+        position: relative;
+        width: 240px;
+        height: 160px;
+        margin: 0 auto;
+        box-sizing: border-box;
+        border: 1px solid #666;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .upload-box > input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: none;
+        outline: none;
+        opacity: 0;
+    }
+    
+    .upload-box > p {
+        font: 1.3rem/2 "";
+        color: #666;
+        margin: 0;
+    }
     </style>
 </head>
 
@@ -64,39 +64,125 @@
     <script src="uploadimg2.js"></script>
     <script>
     $(document).ready(function() {
-       $(function(){
+        $(function() {
+
+            // $("#upload-input").on("change", function() {
+            //     $(this).UploadImg({
+            //         // "maxWidth": 800,                 // 图片输出的最大宽度或高度 有边框时最大宽度/高度会加上borderWidth*2
+            //         // "newImgType": "png",             // 图片输出类型 不传参默认png
+            //         // "imgQuality": "0.8",             // 图片压缩质量 不传参默认0.8 且只针对输出类型为jpeg/webp
+            //         // "borderWidth": 10,               // 不传 默认0
+            //         // "borderColor": "#00f",           // 边框颜色 默认白色 颜色值为16进制颜色
+            //         uploadProgress: function(rate){
+            //             console.log(rate);
+            //             if(rate != "100%"){
+            //                 $(".explain-msg").text("图片加载中...");
+            //             }
+            //         },
+            //         uploadFinished: function(data) {
+            //             if(data.status === 0){       // data.status: -1: 参数传入出错  0: 表示成功获取图片base64 
+            //                 console.log(data.msg);
+            //                 $(".upload-box").css({"background": "url("+ data.base64 +") no-repeat center", "backgroundSize": "contain"});
+            //                 $(".explain-msg").text("");
+            //             }else if(data.status === -1){
+            //                 console.log(data.msg);
+            //             }
+            //         },
+            //         uploadError: function(msg){
+            //             console.log(msg);
+            //         }
+            //     });
+            // });
 
             $("#upload-input").on("change", function() {
-                $(this).UploadImg({
-                    // "maxWidth": 800,                 // 图片输出的最大宽度或高度 有边框时最大宽度/高度会加上borderWidth*2
-                    // "newImgType": "png",             // 图片输出类型 不传参默认png
-                    // "imgQuality": "0.8",             // 图片压缩质量 不传参默认0.8 且只针对输出类型为jpeg/webp
-                    // "borderWidth": 10,               // 不传 默认0
-                    // "borderColor": "#00f",           // 边框颜色 默认白色 颜色值为16进制颜色
-                    uploadProgress: function(rate){
-                        console.log(rate);
-                        if(rate != "100%"){
-                            $(".explain-msg").text("图片加载中...");
-                        }
-                    },
-                    uploadFinished: function(data) {
-                        if(data.status === 0){       // data.status: -1: 参数传入出错  0: 表示成功获取图片base64 
-                            console.log(data.msg);
-                            $(".upload-box").css({"background": "url("+ data.base64 +") no-repeat center", "backgroundSize": "contain"});
-                            $(".explain-msg").text("");
-                        }else if(data.status === -1){
-                            console.log(data.msg);
-                        }
-                    },
-                    uploadError: function(msg){
-                        console.log(msg);
-                    }
-                });
+                var file = this.files[0],
+                    oReader = new FileReader();
+                oReader.onload = function(e) {
+                    var image = new Image();
+                    image.src = e.target.result;
+                    image.onload = function() {
+                        var expectWidth = this.naturalWidth,
+                            expectHeight = this.naturalHeight,
+                            canvas = document.createElement("canvas"),
+                            ctx = canvas.getContext("2d");
+                        canvas.width = expectWidth;
+                        canvas.height = expectHeight;
+                        ctx.drawImage(this, 0, 0, expectWidth, expectHeight);
+                        base64 = canvas.toDataURL("image/jpeg", 0.8);
+                        $(".upload-box").css({
+                            "background": "url(" + base64 + ") no-repeat center",
+                            "backgroundSize": "contain"
+                        });
+                        $(".explain-msg").text("");
+                        console.log(base64.substring(0, 200));
+                    };
+                };
+                oReader.readAsDataURL(file);
             });
 
         }())
     });
     </script>
+    <script type="text/javascript">
+    var result = document.getElementById("result");
+    var file = document.getElementById("file");
+
+    //判断浏览器是否支持FileReader接口  
+    if (typeof FileReader == 'undefined') {
+        result.InnerHTML = "<p>你的浏览器不支持FileReader接口！</p>";
+        //使选择控件不可操作  
+        file.setAttribute("disabled", "disabled");
+    }
+
+    function readAsDataURL() {
+        //检验是否为图像文件  
+        var file = document.getElementById("file").files[0];
+        if (!/image\/\w+/.test(file.type)) {
+            alert("看清楚，这个需要图片！");
+            return false;
+        }
+        var reader = new FileReader();
+        //将文件以Data URL形式读入页面  
+        reader.readAsDataURL(file);
+        reader.onload = function(e) {
+            var result = document.getElementById("result");
+            //显示文件  
+            result.innerHTML = '<img src="' + this.result + '" alt="" />';
+        }
+    }
+
+    function readAsBinaryString() {
+        var file = document.getElementById("file").files[0];
+        var reader = new FileReader();
+        //将文件以二进制形式读入页面  
+        reader.readAsBinaryString(file);
+        reader.onload = function(f) {
+            var result = document.getElementById("result");
+            //显示文件  
+            result.innerHTML = this.result;
+        }
+    }
+
+    function readAsText() {
+        var file = document.getElementById("file").files[0];
+        var reader = new FileReader();
+        //将文件以文本形式读入页面  
+        reader.readAsText(file);
+        reader.onload = function(f) {
+            var result = document.getElementById("result");
+            //显示文件  
+            result.innerHTML = this.result;
+        }
+    }
+    </script>
+    <p>
+        <label>请选择一个文件：</label>
+        <input type="file" id="file" />
+        <input type="button" value="读取图像" onclick="readAsDataURL()" />
+        <input type="button" value="读取二进制数据" onclick="readAsBinaryString()" />
+        <input type="button" value="读取文本文件" onclick="readAsText()" />
+    </p>
+    <div id="result" name="result"></div>
 </body>
 
 </html>
